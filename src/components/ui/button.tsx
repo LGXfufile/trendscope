@@ -48,7 +48,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileHover={{ scale: disabled ? 1 : 1.02 }}
         whileTap={{ scale: disabled ? 1 : 0.98 }}
         disabled={disabled}
-        {...(props as any)}
+        {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       >
         <span className="relative z-10 flex items-center gap-2">
           {children}
