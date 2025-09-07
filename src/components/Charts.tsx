@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface TrendChartProps {
@@ -90,12 +90,6 @@ export function CompetitionMeter({ value, label = 'Competition Level' }: Competi
     if (val < 30) return 'text-green-600';
     if (val < 60) return 'text-yellow-600';
     return 'text-red-600';
-  };
-
-  const getBgColor = (val: number) => {
-    if (val < 30) return 'from-green-500 to-green-400';
-    if (val < 60) return 'from-yellow-500 to-yellow-400';
-    return 'from-red-500 to-red-400';
   };
 
   return (

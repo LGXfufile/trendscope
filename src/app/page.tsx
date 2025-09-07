@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, TrendingUp, Target, Zap, Brain, Clock } from 'lucide-react';
+import { Sparkles, TrendingUp, Target, Brain, Clock } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { KeywordResults } from '@/components/KeywordResults';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { KeywordData, UserHistory } from '@/types';
 
 // Mock data for demonstration

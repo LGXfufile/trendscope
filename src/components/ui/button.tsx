@@ -14,7 +14,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', children, disabled, ...props }, ref) => {
     const baseClasses = cn(
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium",
-      "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
       "disabled:pointer-events-none disabled:opacity-50 active:scale-95",
       "relative overflow-hidden group"
     );
@@ -34,8 +34,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon: "h-10 w-10"
     };
 
+    const MotionButton = motion.button;
+
     return (
-      <motion.button
+      <MotionButton
         ref={ref}
         className={cn(
           baseClasses,
@@ -46,14 +48,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileHover={{ scale: disabled ? 1 : 1.02 }}
         whileTap={{ scale: disabled ? 1 : 0.98 }}
         disabled={disabled}
-        {...props}
+        {...(props as any)}
       >
         <span className="relative z-10 flex items-center gap-2">
           {children}
         </span>
         
         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </motion.button>
+      </MotionButton>
     );
   }
 );
