@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -13,23 +12,21 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, children, hover = true, glass = false, ...props }, ref) => {
     return (
-      <motion.div
+      <div
         ref={ref}
         className={cn(
           "rounded-xl border bg-white/80 dark:bg-gray-900/80 shadow-sm",
           "border-gray-200/50 dark:border-gray-700/50",
           "backdrop-blur-sm",
           glass && "glass-morphism",
-          hover && "hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20",
+          hover && "hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-1 hover:scale-[1.01]",
           "transition-all duration-300",
           className
         )}
-        whileHover={hover ? { y: -2, scale: 1.01 } : {}}
-        transition={{ duration: 0.2 }}
         {...props}
       >
         {children}
-      </motion.div>
+      </div>
     );
   }
 );
