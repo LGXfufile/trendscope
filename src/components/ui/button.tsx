@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,7 +14,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseClasses = cn(
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium",
       "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
-      "disabled:pointer-events-none disabled:opacity-50 active:scale-95",
+      "disabled:pointer-events-none disabled:opacity-50 hover:scale-105 active:scale-95",
       "relative overflow-hidden group"
     );
 
@@ -34,10 +33,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon: "h-10 w-10"
     };
 
-    const MotionButton = motion.button;
-
     return (
-      <MotionButton
+      <button
         ref={ref}
         className={cn(
           baseClasses,
@@ -45,17 +42,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           sizeClasses[size],
           className
         )}
-        whileHover={{ scale: disabled ? 1 : 1.02 }}
-        whileTap={{ scale: disabled ? 1 : 0.98 }}
         disabled={disabled}
-        {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        {...props}
       >
         <span className="relative z-10 flex items-center gap-2">
           {children}
         </span>
         
         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </MotionButton>
+      </button>
     );
   }
 );
