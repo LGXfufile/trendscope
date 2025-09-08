@@ -12,8 +12,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, label, error, icon, iconPosition = 'left', ...props }, ref) => {
-    const [focused, setFocused] = React.useState(false);
-
     return (
       <div className="space-y-2">
         {label && (
@@ -46,8 +44,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
               className
             )}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
+            onFocus={() => {}}
+            onBlur={() => {}}
             {...props}
           />
           
