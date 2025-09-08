@@ -28,41 +28,141 @@ export async function generateAlphabetSuggestions(seedKeyword: string): Promise<
   return shuffled.slice(0, 50);
 }
 
-// 获取Google搜索自动完成建议（模拟）
+// 获取Google搜索自动完成建议（通过API路由获取真实数据）
 export async function getGoogleAutoComplete(keyword: string): Promise<string[]> {
-  // 这里模拟Google搜索的自动完成API
-  // 实际项目中可能需要使用puppeteer或其他方式获取真实的自动完成数据
-  
-  const commonSuffixes = [
-    'tutorial', 'guide', 'tips', 'free', 'online', 'best', 'how to',
-    'vs', 'review', 'price', 'download', 'install', 'setup', 'config',
-    'error', 'fix', 'problem', 'issue', 'help', 'support', 'api',
-    'example', 'demo', 'course', 'training', 'certification', 'job'
-  ];
-  
-  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-  const suggestions: string[] = [];
-  
-  // 生成基于字母的建议
-  alphabet.split('').forEach(letter => {
-    suggestions.push(`${keyword} ${letter}`);
-    suggestions.push(`${keyword} a${letter}`);
-    suggestions.push(`${keyword} ${letter}a`);
-  });
-  
-  // 添加常见后缀
-  commonSuffixes.forEach(suffix => {
-    suggestions.push(`${keyword} ${suffix}`);
-    suggestions.push(`${suffix} ${keyword}`);
-  });
-  
-  // 数字组合
-  for (let i = 0; i <= 20; i++) {
-    suggestions.push(`${keyword} ${i}`);
-    suggestions.push(`${keyword} ${i}0`);
+  try {
+    console.log(`正在获取 "${keyword}" 的真实Google自动完成建议...`);
+    
+    // 调用我们的API路由来获取Google建议
+    const apiUrl = `/api/suggestions?q=${encodeURIComponent(keyword)}`;
+    
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // 设置超时
+        signal: AbortSignal.timeout(10000)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data && data.suggestions && Array.isArray(data.suggestions)) {
+          const suggestions = data.suggestions.filter((s: string) => s && s.trim().length > 0);
+          
+          console.log(`通过${data.source}获取到 ${suggestions.length} 个建议`);
+          console.log('建议列表预览:', suggestions.slice(0, 10));
+          
+          return suggestions;
+        }
+      } else {
+        console.error(`API调用失败: ${response.status} ${response.statusText}`);
+      }
+    } catch (fetchError) {
+      console.error('调用建议API失败:', fetchError);
+    }
+    
+    // 如果API调用失败，使用本地生成的扩展建议
+    console.log('API调用失败，使用本地扩展建议生成...');
+    
+    const allSuggestions: string[] = [];
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    
+    // 基础建议模板
+    const basicSuggestions = [
+      `how to ${keyword}`,
+      `${keyword} tutorial`,
+      `${keyword} guide`, 
+      `${keyword} tips`,
+      `best ${keyword}`,
+      `${keyword} free`,
+      `${keyword} online`,
+      `${keyword} app`,
+      `${keyword} download`,
+      `${keyword} course`,
+      `${keyword} example`,
+      `${keyword} review`,
+      `${keyword} vs`,
+      `${keyword} price`,
+      `what is ${keyword}`,
+      `${keyword} for beginners`,
+      `${keyword} advanced`,
+      `${keyword} alternative`,
+      `${keyword} comparison`,
+      `${keyword} software`,
+      `${keyword} tool`,
+      `${keyword} service`,
+      `${keyword} platform`,
+      `${keyword} solution`,
+      `${keyword} benefits`,
+      `${keyword} features`,
+      `${keyword} pricing`,
+      `${keyword} demo`,
+      `${keyword} training`,
+      `${keyword} certification`,
+    ];
+    allSuggestions.push(...basicSuggestions);
+    
+    // 字母遍历建议 - 更全面的组合
+    for (const letter of alphabet) {
+      const letterSuggestions = [
+        `${keyword} ${letter}`,
+        `${keyword} a${letter}`,
+        `${keyword} ${letter}a`,
+        `how to ${keyword} ${letter}`,
+        `${keyword} for ${letter}`,
+        `best ${keyword} ${letter}`,
+        `${keyword} ${letter} tutorial`,
+        `${keyword} ${letter} guide`,
+      ];
+      allSuggestions.push(...letterSuggestions);
+    }
+    
+    // 数字组合 - 扩展范围
+    for (let i = 1; i <= 25; i++) {
+      allSuggestions.push(`${keyword} ${i}`);
+      if (i <= 12) {
+        allSuggestions.push(`${keyword} ${i}0`);
+      }
+      if (i <= 5) {
+        allSuggestions.push(`${keyword} ${i}00`);
+      }
+    }
+    
+    // 年份组合（2020-2025）
+    for (let year = 2020; year <= 2025; year++) {
+      allSuggestions.push(`${keyword} ${year}`);
+    }
+    
+    // 去重并过滤，返回更多建议
+    const uniqueSuggestions = [...new Set(allSuggestions)]
+      .filter(s => s && s.trim().length > 0 && s !== keyword)
+      .slice(0, 200); // 增加到200个建议
+    
+    console.log(`本地生成了 ${uniqueSuggestions.length} 个扩展建议`);
+    return uniqueSuggestions;
+    
+  } catch (error) {
+    console.error(`获取 "${keyword}" 自动完成建议时发生错误:`, error);
+    
+    // 最终备用方案
+    const fallbackSuggestions = [
+      `how to ${keyword}`,
+      `${keyword} tutorial`,
+      `${keyword} guide`,
+      `${keyword} tips`,
+      `best ${keyword}`,
+      `${keyword} free`,
+      `${keyword} online`,
+      `${keyword} app`,
+      `${keyword} course`,
+      `what is ${keyword}`
+    ];
+    
+    return fallbackSuggestions;
   }
-  
-  return suggestions.slice(0, 100); // 返回前100个建议
 }
 
 // Google Trends 相关功能
@@ -220,7 +320,7 @@ export async function searchAndAnalyzeKeywords(seedKeyword: string): Promise<{
   relatedKeywords: KeywordData[];
   totalSuggestions: number;
 }> {
-  console.log(`开始基于 "${seedKeyword}" 进行a-z关键词分析...`);
+  console.log(`开始基于 "${seedKeyword}" 进行扩展关键词分析...`);
   
   try {
     // 1. 分析主关键词
@@ -230,42 +330,74 @@ export async function searchAndAnalyzeKeywords(seedKeyword: string): Promise<{
     const alphabetSuggestions = await generateAlphabetSuggestions(seedKeyword);
     console.log(`生成了 ${alphabetSuggestions.length} 个字母遍历建议`);
     
-    // 3. 获取Google自动完成建议
-    const autoCompleteSuggestions = await getGoogleAutoComplete(seedKeyword);
-    console.log(`生成了 ${autoCompleteSuggestions.length} 个自动完成建议`);
+    // 3. 获取真实Google自动完成建议
+    const realSuggestions = await getGoogleAutoComplete(seedKeyword);
+    console.log(`获取了 ${realSuggestions.length} 个真实/扩展建议`);
     
     // 4. 合并所有建议并去重
-    const allSuggestions = [...new Set([...alphabetSuggestions, ...autoCompleteSuggestions])];
+    const allSuggestions = [...new Set([...alphabetSuggestions, ...realSuggestions])];
     console.log(`合并去重后共 ${allSuggestions.length} 个建议`);
     
-    // 5. 选择最相关的关键词进行分析（避免API限制）
+    // 5. 智能选择要分析的关键词 - 增加分析数量
     const keywordsToAnalyze = allSuggestions
-      .filter(k => k !== seedKeyword && k.length > 3) // 过滤掉太短的词
-      .slice(0, 8); // 只分析前8个相关关键词
-    
-    console.log(`选择分析以下关键词:`, keywordsToAnalyze);
-    
-    // 6. 批量分析选中的关键词
-    const relatedResults: KeywordData[] = [];
-    
-    for (let i = 0; i < keywordsToAnalyze.length; i++) {
-      const keyword = keywordsToAnalyze[i];
-      try {
-        console.log(`正在分析第 ${i + 1}/${keywordsToAnalyze.length} 个关键词: "${keyword}"`);
-        const result = await analyzeKeyword(keyword);
-        relatedResults.push(result);
+      .filter(k => k !== seedKeyword && k.length > 3 && k.length < 80) // 过滤掉太短或太长的词
+      .filter(k => !k.includes('undefined') && !k.includes('null')) // 过滤掉无效词
+      .sort((a, b) => {
+        // 优先选择包含原关键词的建议
+        const aContainsOriginal = a.toLowerCase().includes(seedKeyword.toLowerCase());
+        const bContainsOriginal = b.toLowerCase().includes(seedKeyword.toLowerCase());
         
-        // 添加延迟避免API限制
-        if (i < keywordsToAnalyze.length - 1) {
-          console.log('等待1秒以避免API限制...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        if (aContainsOriginal && !bContainsOriginal) return -1;
+        if (!aContainsOriginal && bContainsOriginal) return 1;
+        
+        // 优先选择长度适中的关键词
+        return Math.abs(a.length - 15) - Math.abs(b.length - 15);
+      })
+      .slice(0, 20); // 分析前20个最相关的关键词
+    
+    console.log(`选择分析以下 ${keywordsToAnalyze.length} 个关键词:`, keywordsToAnalyze.slice(0, 5));
+    
+    // 6. 批量分析选中的关键词 - 并行处理以提高效率
+    const relatedResults: KeywordData[] = [];
+    const batchSize = 5; // 每批处理5个关键词
+    
+    for (let i = 0; i < keywordsToAnalyze.length; i += batchSize) {
+      const batch = keywordsToAnalyze.slice(i, i + batchSize);
+      
+      console.log(`正在并行分析第 ${Math.floor(i/batchSize) + 1} 批关键词 (${batch.length} 个)...`);
+      
+      // 并行处理当前批次
+      const batchPromises = batch.map(async (keyword, index) => {
+        try {
+          console.log(`  - 分析: "${keyword}"`);
+          const result = await analyzeKeyword(keyword);
+          return result;
+        } catch (error) {
+          console.error(`分析关键词 "${keyword}" 失败:`, error);
+          return null;
         }
-      } catch (error) {
-        console.error(`分析关键词 "${keyword}" 失败:`, error);
+      });
+      
+      const batchResults = await Promise.allSettled(batchPromises);
+      
+      batchResults.forEach((result) => {
+        if (result.status === 'fulfilled' && result.value) {
+          relatedResults.push(result.value);
+        }
+      });
+      
+      // 添加延迟避免API过载，但减少延迟时间
+      if (i + batchSize < keywordsToAnalyze.length) {
+        console.log('等待0.5秒再处理下一批...');
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
     
+    // 按搜索量排序结果
+    relatedResults.sort((a, b) => b.volume - a.volume);
+    
     console.log(`分析完成! 主关键词: 1个, 相关关键词: ${relatedResults.length}个, 总建议数: ${allSuggestions.length}`);
+    console.log(`结果摘要: 最高搜索量 ${Math.max(...relatedResults.map(r => r.volume))}, 平均搜索量 ${Math.round(relatedResults.reduce((sum, r) => sum + r.volume, 0) / relatedResults.length)}`);
     
     return {
       mainKeyword: mainKeywordData,
@@ -278,10 +410,30 @@ export async function searchAndAnalyzeKeywords(seedKeyword: string): Promise<{
     
     // 返回备用结果
     const backupResult = await analyzeKeyword(seedKeyword);
+    
+    // 生成一些基础的备用关键词
+    const backupKeywords: KeywordData[] = [];
+    const basicVariations = [
+      `how to ${seedKeyword}`,
+      `${seedKeyword} tutorial`,
+      `${seedKeyword} guide`,
+      `best ${seedKeyword}`,
+      `${seedKeyword} tips`
+    ];
+    
+    for (const variation of basicVariations) {
+      try {
+        const backup = await analyzeKeyword(variation);
+        backupKeywords.push(backup);
+      } catch (e) {
+        // 忽略备用关键词的错误
+      }
+    }
+    
     return {
       mainKeyword: backupResult,
-      relatedKeywords: [],
-      totalSuggestions: 0
+      relatedKeywords: backupKeywords,
+      totalSuggestions: basicVariations.length + 10 // 估算值
     };
   }
 }
