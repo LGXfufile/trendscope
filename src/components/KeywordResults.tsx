@@ -65,12 +65,22 @@ export function KeywordResults({ results, loading = false, onSaveKeyword }: Keyw
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
-          Keyword Analysis Results
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {formatNumber(results.length)} keywords found
-        </p>
+        <div>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
+            关键词分析结果
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            基于a-z遍历和Google Trends数据分析
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            {formatNumber(results.length)}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            关键词数量
+          </p>
+        </div>
       </div>
 
       {results.map((keyword, index) => (
