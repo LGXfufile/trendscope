@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -30,7 +29,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
           
-          <motion.input
+          <input
             ref={ref}
             type={type}
             className={cn(
@@ -38,7 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "px-4 py-3 text-sm transition-all duration-200",
               "border-gray-200 dark:border-gray-700",
               "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-              "focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+              "focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:scale-[1.01]",
               "dark:focus:border-blue-400 dark:focus:ring-blue-400/20",
               "disabled:cursor-not-allowed disabled:opacity-50",
               "backdrop-blur-sm",
@@ -49,10 +48,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             )}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            animate={{
-              scale: focused ? 1.01 : 1,
-            }}
-            transition={{ duration: 0.2 }}
             {...props}
           />
           
@@ -64,13 +59,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </div>
         
         {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-red-500"
-          >
-            {error}
-          </motion.p>
+          <div className="animate-slide-down">
+            <p className="text-sm text-red-500">
+              {error}
+            </p>
+          </div>
         )}
       </div>
     );
